@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sweet 17 Birthday!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root { --pink: #ffb7c5; --white: #ffffff; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Comic Neue', cursive; overflow: hidden; }
+        
+        #game-container {
+            width: 100%; height: 100%;
+            background-image: url('star_bg.jpg');
+            background-size: cover; background-position: center;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .content-box {
+            background: rgba(255, 255, 255, 0.88);
+            padding: 20px; border-radius: 25px;
+            width: 90%; max-height: 85vh;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center; overflow-y: auto;
+            border: 2px solid white;
+        }
+
+        .main-img { max-width: 160px; margin: 10px 0; }
+        
+        /* Three Polaroids Layout */
+        .polaroid-container {
+            display: flex; justify-content: center; align-items: center; 
+            gap: 5px; flex-wrap: wrap; margin-top: 10px;
+        }
+        .polaroid {
+            background: white; padding: 8px 8px 30px 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            display: inline-block; transition: 0.3s;
+        }
+        .p1 { transform: rotate(-8deg); }
+        .p2 { transform: rotate(2deg); z-index: 2; }
+        .p3 { transform: rotate(10deg); }
+        .polaroid img { width: 100px; height: 100px; object-fit: cover; }
+
+        .vinyl {
+            width: 160px; height: 160px; border-radius: 50%;
+            animation: spin 4s linear infinite; margin: 10px auto;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .letter-text {
+            text-align: left; line-height: 1.5; font-size: 14px;
+            white-space: pre-wrap; color: #333; padding: 15px;
+            background: rgba(255,255,255,0.6); border-radius: 15px;
+        }
+
+        button {
+            padding: 10px 20px; border-radius: 50px; border: 2px solid black;
+            background: white; cursor: pointer; font-size: 16px; font-family: 'Comic Neue';
+            margin-top: 10px;
+        }
+        button:hover { background: var(--pink); }
+        .candle { font-size: 40px; cursor: pointer; display: inline-block; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="content-box">
+        <h2 id="text-display" style="font-size: 1.2rem;"></h2>
+        <div id="media-container">
+            <img id="stage-img" src="miffy.png" class="main-img">
+        </div>
+        <button id="next-btn" onclick="nextStage()">Next ✨</button>
+    </div>
+</div>
+
+<audio id="audio1" src="bgm.mp3" loop></audio>
+<audio id="audio2" src="ribs.mp3" loop></audio>
+
+<script>
+    let stage = 1;
+    const textDisplay = document.getElementById('text-display');
+    const stageImg = document.getElementById('stage-img');
+    const mediaContainer = document.getElementById('media-container');
+    const audio1 = document.getElementById('audio1');
+    const audio2 = document.getElementById('audio2');
+
+    const contents = [
+        "",
+        "Happy 17th Birthday to my favorite cousin!",
+        "You're literally the best friend I could ask for.",
+        "To more late night talks and memories...",
+        "I'm so proud of who you've become!",
+        "Ready to see some throwbacks?",
+        "Look at us back then! 🥺", // Stage 6
+        "This song always reminds me of us... 🎵", // Stage 7
+        "Click the jar for a little note!", // Stage 8
+        "Make a wish and blow out the candles!", // Stage 9
+        "A letter for you...", // Stage 10
+        "I have one more surprise!" // Stage 11
+    ];
+
+    function typeWriter(text) {
+        textDisplay.innerHTML = "";
+        let i = 0;
+        function type() {
+            if (i < text.length) {
+                textDisplay.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(type, 40);
+            }
+        }
+        type();
+    }
+
+    function nextStage() {
+        stage++;
+        if (stage <= 5) {
+            typeWriter(contents[stage]);
+        } else if (stage === 6) {
+            typeWriter(contents[6]);
+            mediaContainer.innerHTML = `
+                <div class="polaroid-container">
+                    <div class="polaroid p1"><img src="childhood1.jpg"></div>
+                    <div class="polaroid p2"><img src="childhood2.jpg"></div>
+                    <div class="polaroid p3"><img src="childhood3.jpg"></div>
+                </div>`;
+            audio1.play().catch(e => console.log("Audio play blocked until click"));
+        } else if (stage === 7) {
+            audio1.pause();
+            typeWriter(contents[7]);
+            mediaContainer.innerHTML = `<img src="vinyl.png" class="vinyl"><p style="font-size: 14px;">Now Playing: Ribs - Lorde</p>`;
+            audio2.play();
+        } else if (stage === 8) {
+            typeWriter(contents[8]);
+            mediaContainer.innerHTML = `<div style="font-size:70px; cursor:pointer;" onclick="showNote()">🫙</div><div id="jar-note" style="margin-top:5px; font-weight:bold; color: #d63384; font-size: 14px;">(Tap the jar)</div>`;
+        } else if (stage === 9) {
+            typeWriter(contents[9]);
+            mediaContainer.innerHTML = `<div style="font-size:70px;">🎂</div><div id="candles"><span class="candle" onclick="blow(this)">🔥</span><span class="candle" onclick="blow(this)">🔥</span><span class="candle" onclick="blow(this)">🔥</span></div>`;
+        } else if (stage === 10) {
+            typeWriter(contents[10]);
+            mediaContainer.innerHTML = `<div class="letter-text">Dearest [Name],\n\n[PASTE YOUR LETTER HERE]\n\nLove, [Your Name]</div>`;
+        } else if (stage === 11) {
+            typeWriter(contents[11]);
+            mediaContainer.innerHTML = `
+                <div style="font-size:40px;">💐✨</div>
+                <button onclick="window.open('YOUR_BOUQUET_LINK_HERE', '_blank')" style="background: #ffe4e1; padding: 15px;">
+                    Claim your Flowers!
+                </button>`;
+            document.getElementById('next-btn').style.display = 'none';
+        }
+    }
+
+    function showNote() {
+        const notes = ["You're an icon!", "Always here for you.", "17 & Fabulous!", "Best cousins forever."];
+        document.getElementById('jar-note').innerText = notes[Math.floor(Math.random() * notes.length)];
+    }
+
+    function blow(element) {
+        element.style.visibility = 'hidden';
+        confetti({ particleCount: 60, spread: 70, origin: { y: 0.8 } });
+    }
+
+    typeWriter(contents[1]);
+</script>
+</body>
+</html>
